@@ -5,11 +5,6 @@ class Linebot_action
 {
     const LOCATION_URI = 'line://nv/location';
 
-    public function __construct()
-    {
-        $this->load->helper('my');
-    }
-
     public function textAction()
     {
         $tz = timezone();
@@ -48,12 +43,13 @@ class Linebot_action
             "altText" => "位置情報を送信してください。",
             "template" => [
                 "type" => "buttons",
-                "title" => "Please send location",
                 "text" => "{$message}\n近くの飲食店を探します。\n現在の位置を送信してください。",
-                "defaultAction" => [
-                    "type" => "uri",
-                    "label" => "現在地を送信",
-                    "uri" => self::LOCATION_URI
+                "actions" => [
+                    [
+                        "type" => "uri",
+                        "label" => "現在地を送信",
+                        "uri" => self::LOCATION_URI
+                    ]
                 ]
             ]
         ];

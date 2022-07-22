@@ -24,24 +24,27 @@ class Linebot extends CI_Controller
         $json_string = file_get_contents('php://input');
         if ($json_string) {
             $json_object = json_decode($json_string);
-            $userId = $json_object->{"events"}[0]->{"source"}->{"userId"};
+            $lineUserId = $json_object->{"events"}[0]->{"source"}->{"userId"};
 
             //取得データ
             $replyToken = $json_object->{"events"}[0]->{"replyToken"};        //返信用トークン
-            $message_type = $json_object->{"events"}[0]->{"message"}->{"type"};    //メッセージタイプ
+            $message_type = $json_object->{"events"}[0]->{"type"};    //メッセージタイプ
 
             switch ($message_type) {
                 case 'follow':
-                    $message = "お友達追加ありがとうございます。";
+                    $message = [
+                        "type" => "text",
+                        "text" => "お友達追加ありがとうございます。"
+                    ];
                     break;
                 case 'unfollow':
-                    $message = "行ってしまわれるのですね...";
-                    break;
-                case 'text':
+                    exit;
+                case 'message':
                     $message = $this->linebot_action->textAction();
                     break;
                 case 'location':
                     $message = $this->linebot_action->locationAction($json_object->{"events"}[0]);
+                    debug_log($message);
                     break;
                 case 'sticker':
                     exit;
@@ -49,32 +52,20 @@ class Linebot extends CI_Controller
                     exit;
             }
 
-            
-
-            // //返信メッセージ
-            // $return_message_text = "「" . $message_text . "」なの？";
-
             //返信実行
-            $this->sending_messages($replyToken, $message_type, $message);
+            $this->sendMessage($replyToken, $lineUserId, $message);
         }
 
     }
 
     //メッセージの送信
-    private function sendMessage($replyToken, $message_type, $return_message_text)
+    private function sendMessage($replyToken, $lineUserId, $response_format_text)
     {
-        $accessToken = $this->accessToken;
-
-        //レスポンスフォーマット
-        $response_format_text = [
-            "type" => $message_type,
-            "text" => $return_message_text
-        ];
-
         //ポストデータ
         $post_data = [
             "replyToken" => $replyToken,
-            "messages" => [$response_format_text]
+            "to" => $lineUserId,
+            "messages" => [ $response_format_text ]
         ];
 
         //curl実行
@@ -85,7 +76,7 @@ class Linebot extends CI_Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json; charser=UTF-8',
-            'Authorization: Bearer ' . $accessToken
+            'Authorization: Bearer ' . $this->accessToken
         ));
         $result = curl_exec($ch);
         curl_close($ch);
