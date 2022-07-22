@@ -8,11 +8,13 @@ class Home extends CI_Controller
         parent::__construct();
 
         $this->load->model('users_model');
+        $this->load->library('hotpepper');
     }
 
     public function index()
     {
         $data['users'] = $this->users_model->getUsers();
+        $genres = $this->hotpepper->callGenreMaster();
         
         return $this->load->view('home', $data);
     }
