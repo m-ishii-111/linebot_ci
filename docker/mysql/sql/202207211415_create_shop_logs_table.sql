@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS `shop_logs` (
+    `id`            INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `line_user_id`  VARCHAR(255) NOT NULL,
+    `hp_shop_id`    VARCHAR(255) NOT NULL,
+    `hp_genre_code` VARCHAR(255) NOT NULL,
+    `search_date`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
