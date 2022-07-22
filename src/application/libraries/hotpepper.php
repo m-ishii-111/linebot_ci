@@ -10,11 +10,11 @@ class Hotpepper
         $this->apiKey = getenv('HOTPEPPER_API_KEY');
     }
 
-    public function callGenreMaster()
+    public function callGenreMaster(): array
     {
         $baseUri = 'https://webservice.recruit.co.jp/hotpepper/genre/v1/';
         $options = [
-            'key' => $this->apiKey,
+            'key'    => $this->apiKey,
             'format' => 'json'
         ];
 
@@ -22,7 +22,7 @@ class Hotpepper
         return $response['results'];
     }
 
-    public function callRestaurants(string $latitude, string $longitude)
+    public function callRestaurants(string $latitude, string $longitude): array
     {
         $baseUri = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/';
         $options = [
@@ -36,7 +36,16 @@ class Hotpepper
             'count'     => '50',
         ];
 
-        $response = $this->sendCurl($baseUrl, 'POST', $options);
+        // 昼はランチで探す
+        if (timezone() == 'noon') {
+            $options[] = ['lunch' => 1];
+        }
+        // 夜中は深夜営業で探す
+        if (timezone() == 'midnight') {
+            $options[] = ['midnight' => 1, 'midnight_meal' => 1];
+        }
+        
+        $response = $this->sendCurl($baseUri, 'GET', $options);
         return $response['results'];
     }
 

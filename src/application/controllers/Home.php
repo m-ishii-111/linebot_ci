@@ -14,7 +14,9 @@ class Home extends CI_Controller
     public function index()
     {
         $data['users'] = $this->users_model->getUsers();
-        $genres = $this->hotpepper->callGenreMaster();
+
+        $lat = '35.68503';
+        $lng = '139.78271';
         
         return $this->load->view('home', $data);
     }
